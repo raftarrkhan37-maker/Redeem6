@@ -49,9 +49,9 @@
     .video-label { position: absolute; top: 12px; left: 12px; display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; font-size: 10px; font-weight: 800; letter-spacing: 0.12em; background: rgba(0, 0, 0, 0.72); border: 1px solid var(--line); border-radius: 999px; color: var(--signal); z-index: 5; }
     .play-hint { position: absolute; top: 62%; left: 60%; transform: translate(-50%, -50%); z-index: 30; pointer-events: none; display: flex; flex-direction: column; align-items: center; animation: hintBounce 1.2s ease-in-out infinite; }
     .play-hint.hidden { display: none; }
-    .hint-hand-img { width: 105px; height: auto; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.5)); animation: handPulse 1.2s ease-in-out infinite; }
+    .hint-hand-img { width: 100px; height: auto; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.5)); animation: handPulse 1.2s ease-in-out infinite; }
     .hint-text { margin-top: 2px; background: rgba(255, 107, 44, 0.95); color: #fff; font-family: var(--display); font-size: 13px; font-weight: 800; letter-spacing: 0.08em; padding: 5px 12px; border-radius: 999px; text-transform: uppercase; box-shadow: 0 4px 18px rgba(255, 107, 44, 0.5); }
-    @keyframes hintBounce { 0%, 100% { transform: translate(-50%, -50%) translateY(0); } 50% { transform: translate(-50%, -50%) translateY(-8px); } }
+    @keyframes hintBounce { 0%, 100% { transform: translate(-50%, -50%) translateY(0); } 50% { transform: translate(-50%, -50%) translateY(-6px); } }
     @keyframes handPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
     .bridge-title { font-family: var(--display); font-size: clamp(30px, 7vw, 44px); font-weight: 800; letter-spacing: 0.01em; line-height: 0.95; text-transform: uppercase; margin-bottom: 10px; }
     .bridge-sub { font-size: 14px; color: var(--muted); line-height: 1.5; margin-bottom: 12px; max-width: 34ch; }
@@ -107,7 +107,7 @@
     .diamond-btn:active { transform: scale(0.98); }
     .diamond-btn .emoji { font-size: 22px; line-height: 1; }
     footer { position: relative; z-index: 1; text-align: center; padding: 10px 16px 18px; font-size: 10px; color: var(--muted); border-top: 1px solid rgba(255, 255, 255, 0.05); }
-    @media (max-width: 600px) { header { padding: 12px 14px; } .page { padding: 14px 12px 28px; } .icon-wrap { width: 64px; height: 64px; border-radius: 16px; } .comments-scroll { max-height: 180px; } .offer-title { font-size: 20px; } .hint-hand-img { width: 100px; } .hint-text { font-size: 12px; } }
+    @media (max-width: 600px) { header { padding: 12px 14px; } .page { padding: 14px 12px 28px; } .icon-wrap { width: 64px; height: 64px; border-radius: 16px; } .comments-scroll { max-height: 180px; } .offer-title { font-size: 20px; } .hint-hand-img { width: 85px; } .hint-text { font-size: 12px; } }
   </style>
 </head>
 <body>
@@ -135,7 +135,7 @@
       <section class="video-panel">
         <div class="section-tag">Step 01 — Watch</div>
         <div class="video-frame">
-          <video id="protectedVideo" controls controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false;" preload="auto" playsinline>
+          <video id="protectedVideo" controls controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false;" preload="auto" playsinline autoplay>
             <source src="https://ultimatetop.in/Redeem%20code%20spin%20wheel/copy_FFDC4A60-05F8-484D-AE75-E669907AB0E4.mov" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
@@ -225,8 +225,20 @@
       video.addEventListener('play', hideHint);
       video.addEventListener('playing', hideHint);
       let playAttempted = false;
-      const attemptPlay = () => { if (playAttempted) return; playAttempted = true; video.play().catch(() => {}); };
-      if (video.readyState >= 3) attemptPlay(); else video.addEventListener('canplay', attemptPlay, { once: true });
+      const attemptPlay = () => {
+        if (playAttempted) return;
+        playAttempted = true;
+        video.play().catch(() => {
+          document.addEventListener('click', function playOnClick() {
+            video.muted = false;
+            video.volume = 1;
+            video.play();
+            document.removeEventListener('click', playOnClick);
+          }, { once: true });
+        });
+      };
+      if (video.readyState >= 3) attemptPlay();
+      else video.addEventListener('canplay', attemptPlay, { once: true });
     }
     const viewerEl = document.getElementById('viewerCount');
     let viewers = 1284;
