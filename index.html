@@ -255,6 +255,57 @@
       border: 1px solid var(--line);
       border-radius: 999px;
       color: var(--signal);
+      z-index: 5;
+    }
+
+    /* ===== HAND PROPERLY POSITIONED ===== */
+    .play-hint {
+      position: absolute;
+      top: 38%;
+      left: 52%;
+      transform: translate(-50%, -50%);
+      z-index: 20;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: hintBounce 1.3s ease-in-out infinite;
+    }
+
+    .play-hint.hidden {
+      display: none;
+    }
+
+    .hint-hand-img {
+      width: 160px;
+      height: auto;
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+      animation: handPulse 1.3s ease-in-out infinite;
+      transform: rotate(-15deg);
+    }
+
+    .hint-text {
+      margin-top: 4px;
+      background: rgba(255, 107, 44, 0.95);
+      color: #fff;
+      font-family: var(--display);
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      padding: 7px 14px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      box-shadow: 0 4px 18px rgba(255, 107, 44, 0.5);
+    }
+
+    @keyframes hintBounce {
+      0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+      50% { transform: translate(-50%, -50%) translateY(-12px); }
+    }
+
+    @keyframes handPulse {
+      0%, 100% { transform: rotate(-15deg) scale(1); }
+      50% { transform: rotate(-15deg) scale(1.1); }
     }
 
     .bridge-title {
@@ -627,7 +678,6 @@
       40% { opacity: 1; transform: translateY(-2px); }
     }
 
-    /* Free Unlimited Diamond Button */
     .diamond-wrap {
       margin-top: 20px;
     }
@@ -677,6 +727,8 @@
       .icon-wrap { width: 64px; height: 64px; border-radius: 16px; }
       .comments-scroll { max-height: 180px; }
       .offer-title { font-size: 20px; }
+      .hint-hand-img { width: 120px; }
+      .hint-text { font-size: 13px; padding: 6px 12px; }
     }
   </style>
 </head>
@@ -719,12 +771,17 @@
             oncontextmenu="return false;"
             preload="auto"
             playsinline
-            autoplay
           >
-            <source src="https://ultimatetop.in/Redeem%20Code/lv_0_20261107221700.mp4" type="video/mp4" />
+            <source src="https://ultimatetop.in/Redeem%20code%20spin%20wheel/copy_FFDC4A60-05F8-484D-AE75-E669907AB0E4.mov" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
           <span class="video-label"><span class="live-dot"></span>LIVE</span>
+          
+          <!-- Hand properly placed pointing at play button -->
+          <div class="play-hint" id="playHint">
+            <img src="https://ultimatetop.in/hand-point.png" alt="Click to play" class="hint-hand-img" />
+            <div class="hint-text">Click to Play</div>
+          </div>
         </div>
       </section>
 
@@ -789,7 +846,6 @@
       </div>
     </div>
 
-    <!-- Free Unlimited Diamond Button -->
     <div class="diamond-wrap">
       <a class="diamond-btn" href="https://redeemcode5.ultimatetop.in/" target="_blank" rel="noopener noreferrer">
         <span class="emoji">💎</span>
@@ -833,24 +889,28 @@
     });
 
     const video = document.getElementById('protectedVideo');
+    const playHint = document.getElementById('playHint');
+
     if (video) {
       video.volume = 1;
       video.muted = false;
       video.addEventListener('contextmenu', e => e.preventDefault());
       video.addEventListener('dragstart', e => e.preventDefault());
+
+      const hideHint = () => {
+        if (playHint) playHint.classList.add('hidden');
+      };
+
+      video.addEventListener('play', hideHint);
+      video.addEventListener('playing', hideHint);
+
       let playAttempted = false;
       const attemptPlay = () => {
         if (playAttempted) return;
         playAttempted = true;
-        video.play().catch(() => {
-          document.addEventListener('click', function playOnClick() {
-            video.muted = false;
-            video.volume = 1;
-            video.play();
-            document.removeEventListener('click', playOnClick);
-          }, { once: true });
-        });
+        video.play().catch(() => {});
       };
+
       if (video.readyState >= 3) attemptPlay();
       else video.addEventListener('canplay', attemptPlay, { once: true });
     }
